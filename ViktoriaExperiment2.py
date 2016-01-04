@@ -387,7 +387,7 @@ def ExecBlock(listBlock):
 
 
 
-debug = True # zu Entwicklungszwecken
+debug = False # zu Entwicklungszwecken
 
 blocklistOrt, blocklistGender = MakeBlockLists()
 random.shuffle(blocklistOrt)
@@ -402,53 +402,65 @@ blockGender2 = blocklistGender[int(len(blocklistGender)/2):]
 
 def idxCueRep(blocklist):
     t = len(blocklist)
-    idx = -1 # default is no repetition
+    if t == 0:
+        return [], []
+    goodidx = []
+    badidx = []
     for i in range(t-1):
         a = blocklist[i]
         b = blocklist[i+1]
         if a[0] == b[0] and a[1] == b[1]: # cue repetition
-            idx = i # position of repetition
-            break
-    return idx
+            badidx.append(i) # position of repetition
+        else:
+            goodidx.append(i)
+    goodidx.append(t-1)  # last item can't have cue repetition
+    return goodidx, badidx
             
 
-def CueNoRepShuffle(blocklist):
+def CueNoRepShuffle(oblocklist):
+    blocklist = oblocklist[:] # [:] avoids reference. copy instead
     random.shuffle(blocklist)
-    newlist = []
-    tt = len(blocklist)
-    print tt
-    iflag = True
-    indx = idxCueRep(blocklist)
-    count = 0
-    while indx > -1:
-        newlist.append(blocklist[:indx])
-        blocklist = blocklist[indx:]
-        random.shuffle(blocklist)
-        indx = idxCueRep(blocklist)
-        count += 1
-        if count > 5 * tt: # give up
-            count = -1
-            newlist.append(blocklist)
-            break
-    if len(newlist) == 0:
-        newlist = blocklist
-    if idxCueRep(newlist) > -1:
-        count = -1
-    return newlist, count
-    
+    gidx, bidx = idxCueRep(blocklist)
+    goodlist = []
+    badlist = []
+    for i in gidx:
+        goodlist.append(blocklist[i])
+    for i in bidx:
+        badlist.append(blocklist[i])
+    return goodlist, badlist
 
-random.shuffle(blocklistOrt)
-random.shuffle(blocklistGender)
+def CueRepRemove(liste):
+    ncrlist = []
+    while len(liste) != len(ncrlist):
+        gl, bl = CueNoRepShuffle(liste)
+        ncrlist = []
+        for id in range(1000):
+            ncrlist += gl
+            if len(bl) > 0:
+                gl, bl = CueNoRepShuffle(bl)
+            else:
+                break
+    return ncrlist # no cue repetition list
 
-#i=-1 # -1 means cue repetition
-#while i<0: # if necessary try until doomsday
-#    blocklistOrt, i = CueNoRepShuffle(blocklistOrt)
-#i=-1
-#while i<0:
-#    blocklistGender, i = CueNoRepShuffle(blocklistGender)
 
-blockPractOrt = blocklistOrt[:16]
-blockPractGender = blocklistGender[:16]
+#random.shuffle(blocklistOrt)
+#random.shuffle(blocklistGender)
+
+# shuffle and remove cue repetitions
+
+blocklistOrt = CueRepRemove(blocklistOrt)
+blocklistGender = CueRepRemove(blocklistGender)
+
+blockPractOrt = blocklistOrt[:] # [:] avoids reference to a mutable object, causes copy instead of reference
+blockPractGender = blocklistGender[:] # very important
+
+# re-shuffle Practice blocks
+blockPractOrt = CueRepRemove(blockPractOrt)
+blockPractGender = CueRepRemove(blockPractGender)
+
+# shorten to 16 items
+blockPractOrt = blockPractOrt[:16]
+blockPractGender = blockPractGender[:16]
 
 # feed TrialHandler
 def FeedTrialHandlerOrt(blockOrt):
