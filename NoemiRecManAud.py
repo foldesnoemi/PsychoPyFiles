@@ -13,9 +13,14 @@
 #===================== Imports ========================
 from psychopy import visual, core, event, gui, sound
 import random, csv, time, numpy as np 
+from __future__ import division  # so that 1/3=0.333 instead of 1/3=0
 #from psychopy.constants import *  # things like STARTED, FINISHED. this is more important with vocal response
 #from __future__ import print_function #why?
 #from psychopy.iohub import launchHubServer
+
+# Ensure that relative paths start from the same directory as this script
+_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+os.chdir(_thisDir)
 
 #================= PSTbox setup here ==================
 

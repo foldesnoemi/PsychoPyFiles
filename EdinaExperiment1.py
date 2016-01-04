@@ -1,5 +1,10 @@
 from psychopy import visual, core, event, gui, sound
 import random, csv
+from __future__ import division  # so that 1/3=0.333 instead of 1/3=0
+
+# Ensure that relative paths start from the same directory as this script
+_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+os.chdir(_thisDir)
 
 def _(string):
     return texts[string][exp_info['language']]
