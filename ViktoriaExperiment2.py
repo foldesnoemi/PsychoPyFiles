@@ -387,7 +387,7 @@ def ExecBlock(listBlock):
 
 
 
-debug = False # zu Entwicklungszwecken
+debug = True # zu Entwicklungszwecken
 
 blocklistOrt, blocklistGender = MakeBlockLists()
 random.shuffle(blocklistOrt)
@@ -395,13 +395,57 @@ random.shuffle(blocklistGender)
 
 # make blocks by splitting blocklists
 
-blockOrt1 = blocklistOrt[:len(blocklistOrt)/2]
-blockOrt2 = blocklistOrt[len(blocklistOrt)/2:]
-blockGender1 = blocklistGender[:len(blocklistGender)/2]
-blockGender2 = blocklistGender[len(blocklistGender)/2:]
+blockOrt1 = blocklistOrt[:int(len(blocklistOrt)/2)]
+blockOrt2 = blocklistOrt[int(len(blocklistOrt)/2):]
+blockGender1 = blocklistGender[:int(len(blocklistGender)/2)]
+blockGender2 = blocklistGender[int(len(blocklistGender)/2):]
+
+def idxCueRep(blocklist):
+    t = len(blocklist)
+    idx = -1 # default is no repetition
+    for i in range(t-1):
+        a = blocklist[i]
+        b = blocklist[i+1]
+        if a[0] == b[0] and a[1] == b[1]: # cue repetition
+            idx = i # position of repetition
+            break
+    return idx
+            
+
+def CueNoRepShuffle(blocklist):
+    random.shuffle(blocklist)
+    newlist = []
+    tt = len(blocklist)
+    print tt
+    iflag = True
+    indx = idxCueRep(blocklist)
+    count = 0
+    while indx > -1:
+        newlist.append(blocklist[:indx])
+        blocklist = blocklist[indx:]
+        random.shuffle(blocklist)
+        indx = idxCueRep(blocklist)
+        count += 1
+        if count > 5 * tt: # give up
+            count = -1
+            newlist.append(blocklist)
+            break
+    if len(newlist) == 0:
+        newlist = blocklist
+    if idxCueRep(newlist) > -1:
+        count = -1
+    return newlist, count
+    
 
 random.shuffle(blocklistOrt)
 random.shuffle(blocklistGender)
+
+#i=-1 # -1 means cue repetition
+#while i<0: # if necessary try until doomsday
+#    blocklistOrt, i = CueNoRepShuffle(blocklistOrt)
+#i=-1
+#while i<0:
+#    blocklistGender, i = CueNoRepShuffle(blocklistGender)
 
 blockPractOrt = blocklistOrt[:16]
 blockPractGender = blocklistGender[:16]
