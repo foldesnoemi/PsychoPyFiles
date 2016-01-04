@@ -1,3 +1,4 @@
+from __future__ import division  # so that 1/3=0.333 instead of 1/3=0
 from psychopy import visual, core, event, gui, sound, data, logging
 from psychopy.constants import *  # things like STARTED, FINISHED
 import random, csv
