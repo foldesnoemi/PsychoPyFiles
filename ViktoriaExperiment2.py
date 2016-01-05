@@ -205,6 +205,8 @@ def ExecBlock(listBlock):
     if thisBlock != None:
         for paramName in thisBlock.keys():
             exec(paramName + '= thisBlock.' + paramName)
+    print thisBlock
+    return 0
 
     for thisBlock in Block:
         currentLoop = Block
@@ -416,6 +418,16 @@ def idxCueRep(blocklist):
     goodidx.append(t-1)  # last item can't have cue repetition
     return goodidx, badidx
             
+def CueRepCheck(blocklist):
+    t = len(blocklist)
+    if t == 0:
+        return False
+    for i in range(t-1):
+        a = blocklist[i]
+        b = blocklist[i+1]
+        if a[0] == b[0] and a[1] == b[1]: # cue repetition
+            return True
+    return False
 
 def CueNoRepShuffle(oblocklist):
     blocklist = oblocklist[:] # [:] avoids reference. copy instead
@@ -431,7 +443,7 @@ def CueNoRepShuffle(oblocklist):
 
 def CueRepRemove(liste):
     ncrlist = []
-    while len(liste) != len(ncrlist):
+    while len(liste) != len(ncrlist) and CueRepCheck(ncrlist):
         gl, bl = CueNoRepShuffle(liste)
         ncrlist = []
         for id in range(1000):
@@ -454,13 +466,19 @@ blocklistGender = CueRepRemove(blocklistGender)
 blockPractOrt = blocklistOrt[:] # [:] avoids reference to a mutable object, causes copy instead of reference
 blockPractGender = blocklistGender[:] # very important
 
+print blockPractOrt
+
 # re-shuffle Practice blocks
 blockPractOrt = CueRepRemove(blockPractOrt)
 blockPractGender = CueRepRemove(blockPractGender)
 
+def ShortenList(l, n):
+    r = l[:n]
+    return r
+
 # shorten to 16 items
-blockPractOrt = blockPractOrt[:16]
-blockPractGender = blockPractGender[:16]
+blockPractOrt = ShortenList(blockPractOrt,16)
+blockPractGender = ShortenList(blockPractGender,16)
 
 # feed TrialHandler
 def FeedTrialHandlerOrt(blockOrt):
