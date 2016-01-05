@@ -33,7 +33,7 @@ texts = {
         'en':"Welcome in experiment"}
 }
 
-exp_info = {'participant':'participant_ID',
+exp_info = {'participant':'1000',
     'language': texts.values()[0].keys()}
 
 dlg = gui.DlgFromDict(exp_info, title= "REC_manual",
