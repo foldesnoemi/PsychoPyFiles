@@ -202,11 +202,11 @@ def ExecBlock(listBlock):
     thisExp.addLoop(Block)  # add the loop to the experiment
     thisBlock = Block.trialList[0]  # so we can initialise stimuli with some values
     # abbreviate parameter names if possible (e.g. rgb=thisBlock.rgb)
+    # !!! this solution looks elegant, but can cause a mess in case of debugging
+    # !!! especially if listBlock is empty
     if thisBlock != None:
         for paramName in thisBlock.keys():
             exec(paramName + '= thisBlock.' + paramName)
-    print thisBlock
-    return 0
 
     for thisBlock in Block:
         currentLoop = Block
@@ -418,10 +418,10 @@ def idxCueRep(blocklist):
     goodidx.append(t-1)  # last item can't have cue repetition
     return goodidx, badidx
             
-def CueRepCheck(blocklist):
+def hasCueRep(blocklist):
     t = len(blocklist)
     if t == 0:
-        return False
+        return True # we need it that way
     for i in range(t-1):
         a = blocklist[i]
         b = blocklist[i+1]
@@ -443,7 +443,7 @@ def CueNoRepShuffle(oblocklist):
 
 def CueRepRemove(liste):
     ncrlist = []
-    while len(liste) != len(ncrlist) and CueRepCheck(ncrlist):
+    while len(liste) != len(ncrlist) and hasCueRep(ncrlist):
         gl, bl = CueNoRepShuffle(liste)
         ncrlist = []
         for id in range(1000):
@@ -459,14 +459,11 @@ def CueRepRemove(liste):
 #random.shuffle(blocklistGender)
 
 # shuffle and remove cue repetitions
-
 blocklistOrt = CueRepRemove(blocklistOrt)
 blocklistGender = CueRepRemove(blocklistGender)
 
 blockPractOrt = blocklistOrt[:] # [:] avoids reference to a mutable object, causes copy instead of reference
 blockPractGender = blocklistGender[:] # very important
-
-print blockPractOrt
 
 # re-shuffle Practice blocks
 blockPractOrt = CueRepRemove(blockPractOrt)
